@@ -12,7 +12,7 @@ class Landing extends Component {
                             <span style={{ fontFamily: "monospace" }}>MERN</span> app
                         </h4>
                         <p className="flow-text grey-text text-darken-1">
-                            A minimal full-stack app showcasing authentications using <a href="https://www.privakey.com" target="_blank">Privakey</a>
+                            A minimal full-stack app showcasing authorizations using <a href="https://www.privakey.com" target="_blank">Privakey</a>
                         </p>
                         <br/>
                         <div className="col s6">

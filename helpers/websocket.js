@@ -52,7 +52,8 @@ function ioHelper (server, session) {
                 'callback': keys.serverUrl + '/auth/processRequest',
                 'content': content,
                 'duration': duration,
-                "additionalInfo": "{'viewType': 'html', 'format': 'standard'}"
+                "additionalInfo": "{'viewType': 'html', 'format': 'standard'}",
+                "showNotification": true
             }
         })
         .then((requestRes) => {
