@@ -1,0 +1,9 @@
+export const GET_ERRORS = "GET_ERRORS";
+export const USER_LOADING = "USER_LOADING";
+export const SET_CURRENT_USER = "SET_CURRENT_USER";
+export const START_REQUEST = "server/sendRequest";
+export const SEND_AUTH_REQUEST = "server/sendAuthRequest";
+export const UPDATE_REQUEST = "server/UPDATE_REQUEST";
+export const SET_LOGIN_METHOD = "SET_LOGIN_METHOD";
+export const APPROVE_LOGIN = "server/APPROVE_LOGIN";
+export const REJECT_LOGIN = "server/REJECT_LOGIN";
