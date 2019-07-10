@@ -1,23 +1,23 @@
 # Milo App
 
-Milo is a sample project that integrates [Privakey](https://www.privakey.com) into a MERN app. Its main goal is to provide code samples to make other developers' lives easier. It permits logging in to the site with Privakey or password, and allows a logged-in user to send a Privakey Request to themselves.
+Milo is a sample project that integrates [PrivakeyCX](https://www.privakey.com) into a MERN app. The purpose of this project is to provide code samples and usage examples of PrivakeyCX. The project covers logging in to the example site with Privakey or password, and allows an authenticated user to send a Privakey challenge request to themselves.
 
-## Getting Started
+## Before You Begin
 
 For the sample to work properly, you'll need 2 things:
 
 * Privakey CX Auth Service
 * Privakey White-Labeled App
 
-Both of these things are commercially licensed, so you'll have to contact sales@privakey.com to get a hold of them. More info on both can be found [in Privakey's docs](https://docs.privakey.com).
+Please contact sales@privakey.com to obtain these packages. Instruction on their usage, as well as more information about them, can be found [in Privakey's documentation](https://docs.privakey.com).
 
 ## Code Snippets
 
 ### Account Binding
 
-Account Binding is when you send a user account to Privakey so it can keep track of them. The White-Labeled App calls this route automatically. In Milo, this is done via the /auth/privakeyBind route, located in the routes/privakey.js.
+The PrivakeyCX Auth Service maps a user's account to a specific set of cryptographic keys on the user's device, and to this end, an account must be bound in the Auth Service. This is accomplished by calling the Auth Service's bind route, sending a unique identifier for the user's account. This account ID is used by an integrating service (in this example, Milo) to reference the account and interact with it. Milo achieves this via the /auth/privakeyBind route, located in routes/privakey. The White-Labeled app will automatically call into this route during user registration.js.
 
-Here's the actual request code, which simply sends Privakey our user's account ID.
+The code below demonstrates the bind process, which simply sends the Auth Service our user's account ID.
 
 ```javascript
 // file: routes/privakey.js
@@ -34,9 +34,7 @@ axios.request({
 })
 ```
 
-This code simply sends Privakey our user's account ID, so it can link it up in its system.
-
-When the response comes back, we are expected to return some data to the White-Labeled App:
+The Auth Service processes this request, binds the account to that account ID, and generates both an internal ID (the Privakey ID) and a session token. When the response is returned, we must forward the Privakey ID, the session token's GUID, and the session token's expiration time to the White-Labeled App. The White-Labeled App then generates the cryptographic material and completes the bind process, binding the key material to the account automatically.
 
 ```javascript
 // file: routes/privakey.js
@@ -55,9 +53,9 @@ When the response comes back, we are expected to return some data to the White-L
 })
 ```
 
-### Send Privakey Request
+### Send Privakey Challenge Request
 
-The core functionality of Privakey is sending Requests. These Requests then show up in the White-Labeled App and the user can respond to them. In Milo, we send these requests via a web-socket connection so we can let the user know when they are acted upon.
+The core functionality of PrivakeyCX is sending rich challenge requests to users. These sent requests appear in the White-Labeled App, allowing the user to respond to them in a secure fashion. In Milo, these requests are sent via a WebSocket connection to inform the user when a challenge request is received by the Auth Service. 
 
 ```javascript
 // file: helpers/websocket.js
@@ -75,7 +73,7 @@ socket.on('action', (action) => {
 });
 ```
 
-Notice that the above code calls sendRequest with a couple of parameters. This is just to prevent duplicated code. The function that actually performs the API call is here:
+Notice that in the above code, sendRequest is called with different parameters based on the type of challenge request to eliminate duplicate code. The function which performs the API call itself is as follows:
 
 ```javascript
 axios.request({
@@ -96,7 +94,7 @@ axios.request({
 })
 ```
 
-Finally, when the call returns, it will contain the GUID for the request that was just generated. We need to hold onto this, because when the request is acted upon, we need to look up which socket to emit the action to.
+Take note of the callback parameter, which is explained below. Finally, when the call returns from the Auth Service, it will contain the GUID for the request that was just generated. This GUID is stored along with the socket's id so that when a challenge request is acted upon, the action will be emitted to the correct socket.
 
 ```javascript
 .then((requestRes) => {
@@ -126,7 +124,7 @@ Finally, when the call returns, it will contain the GUID for the request that wa
 
 ### Process Request
 
-Acting upon requests is asynchronous. When the user finally does act upon a request, Privakey will let us know by calling our callback. Earlier, when we called `/request/add`, we passed it a callback. Specifically, `/auth/processRequest`. This means Privakey will call `/auth/processRequest` when the user acts on the request. When that happens, we want to update the user's page.
+Because of the inherently asynchronous nature of a user responding to a challenge request, the Auth Service utilizes a URI callback. The Auth Service will POST the challenge request and user response to the location of the callback, eliminating the need for polling the request's status. The callback's URI is sent as a parameter when the request is created, and can be seen above when we called `/request/add`, and is valued `/auth/processRequest`. The Auth Service will POST the results of the challenge request to `/auth/processRequest` when the user acts on the request. The page on the site will then update demonstrating the result of the request:
 
 ```javascript
 // file: routes/privakey.js
@@ -168,7 +166,7 @@ ActiveRequest.findOne( {requestGuid: req.body.guid}, function(err, activeRequest
 });
 ```
 
-This code actually handles 2 different flows: A user logging in, and a user sending a sample request to themselves. Depending on the type of request, it forwards slightly different info to the client, which can update accordingly.
+The above code handles two different flows: A user logging in (request type "auth"), and a user sending a sample request to themselves. Depending on the type of request, it forwards slightly different information to the page, which can update accordingly. It is important to note, that while Milo itself makes a distinction between challenge request types, no such distinction exists in the Auth Service, with every request handled the same.
 
 ## Acknowledgements
 
