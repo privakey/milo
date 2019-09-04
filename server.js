@@ -69,5 +69,3 @@ if(process.env.NODE_ENV === 'production') {
 const port = process.env.PORT || 5000; // process.env.port is used by Heroku
 
 http.listen(port, () => console.log(`Server up and running on port ${port}!`));
-
-console.log(config.get("privakeyUrl"));
