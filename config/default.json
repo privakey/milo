@@ -1,0 +1,7 @@
+{
+    "mongoURI": "YOUR_MONGO_CONNECTION_STRING",
+    "secretOrKey": "SECRET_FOR_JWT_GENERATION",
+    "serverUrl": "URL_OF_THIS_SERVER",
+    "privakeyUrl": "URL_OF_PRIVAKEY_CX",
+    "privakeyBasicAuth": "BASIC_AUTH_CREDS_FOR_PRIVAKEY_CX"
+}

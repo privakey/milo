@@ -1,5 +1,5 @@
 const axios = require('axios');
-const keys = require('../config/keys');
+const config = require("config");
 const User = require("../models/User");
 const ActiveRequest = require("../models/ActiveRequests");
 
@@ -33,7 +33,7 @@ function ioHelper (server, session) {
                 User.findOne({ email }).then(user => {
                     console.log(user);
                     sendRequest(user._id, 'auth', socket,
-                        'Are you trying to log in to MILO?', '2m');
+                        '<html><body><p>Are you trying to log in to MILO?</p></body></html>', '2m');
                 });
             }
         });
@@ -41,15 +41,15 @@ function ioHelper (server, session) {
 
     function sendRequest (accountId, requestType, socket, content, duration) {
         axios.request({
-            url: keys.privakeyUrl + "request/add",
+            url: config.get("privakeyUrl") + "request/add",
             method: 'post',
             headers: {
-                'Authorization': 'Basic ' + keys.privakeyBasicAuth,
+                'Authorization': 'Basic ' + config.get("privakeyBasicAuth"),
                 'Content-Type': 'application/json'
             },
             data: {
                 'accountId': accountId,
-                'callback': keys.serverUrl + '/auth/processRequest',
+                'callback': config.get("serverUrl") + '/auth/processRequest',
                 'content': content,
                 'duration': duration,
                 "additionalInfo": "{'viewType': 'html', 'format': 'standard'}",

@@ -1,7 +1,7 @@
 module.exports = function(io) {
     const express = require("express");
     const router = express.Router();
-    const keys = require("../config/keys");
+    const config = require("config");
     const axios = require('axios');
     const jwt = require("jsonwebtoken");
 
@@ -12,10 +12,10 @@ module.exports = function(io) {
     // @desc Links one of our accounts with a PrivakeyCX account. This is called by the mobile app(s).
     router.post("/privakeyBind", (req, res) => {
         axios.request({
-            url: keys.privakeyUrl + 'account/bind',
+            url: config.get("privakeyUrl") + 'account/bind',
             method: 'put',
             headers: { 
-                'Authorization': 'Basic ' + keys.privakeyBasicAuth,
+                'Authorization': 'Basic ' + config.get("privakeyBasicAuth"),
                 'Content-Type': 'application/json'
             },
             data: {
@@ -67,7 +67,7 @@ module.exports = function(io) {
                                 name: user.name
                             };
 
-                            jwt.sign(payload, keys.secretOrKey, { expiresIn: 31556926 },
+                            jwt.sign(payload, config.get("secretOrKey"), { expiresIn: 31556926 },
                                 (err, token) => { 
                                     emit(socket, 'server/APPROVE_LOGIN', {
                                         success: true,
