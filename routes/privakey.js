@@ -23,12 +23,21 @@ module.exports = function(io) {
             }
         })
         .then((bindRes) => {
+            console.log("CX Bind successful, full response:");
+            console.log(bindRes.data);
+
             User.findOneAndUpdate(
                 { _id: req.body.accountId },
-                { privakeyId: bindRes.data.privakeyId }
-            );
-
-            console.log(bindRes.data);
+                { "privakeyId": bindRes.data.privakeyId }
+            ).exec(function(err, user) {
+                if(user) {
+                    console.log("User updated in DB, privakeyId: " + bindRes.data.privakeyId);
+                } else if (err) {
+                    console.log("Error updating user in DB.");
+                    console.log(err);
+                }
+            });
+            
             let response = {
                 privakeyId: bindRes.data.privakeyId,
                 token: bindRes.data.sessionToken.guid,
